@@ -1,26 +1,62 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:teslo_app/features/auth/presentation/providers/auth_provider.dart';
+
+import 'app_router_notifier.dart';
 import 'package:teslo_app/features/auth/auth.dart';
 import 'package:teslo_app/features/products/presentation/screens/products_screen.dart';
 
-final appRouter = GoRouter(
-  initialLocation: '/login',
-  routes: [
-    ///* Auth Routes
-    GoRoute(
-      path: '/login',
-      builder: (context, state) => const LoginScreen(),
-    ),
-    GoRoute(
-      path: '/register',
-      builder: (context, state) => const RegisterScreen(),
-    ),
+final goRouterProvider = Provider((ref) {
+  final goRouterNotifier = ref.read(goRouterNotifierProvider);
 
-    ///* Product Routes
-    GoRoute(
-      path: '/',
-      builder: (context, state) => const ProductsScreen(),
-    ),
-  ],
+  return GoRouter(
+    initialLocation: '/splash',
+    //* con esto detecto cuando el status de authCambie y saber si esta autenticado o no
+    refreshListenable: goRouterNotifier,
+    routes: [
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const CheckAuthStatusScreen(),
+      ),
 
-  ///! TODO: Bloquear si no se está autenticado de alguna manera
-);
+      ///* Auth Routes
+      GoRoute(
+        path: '/login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const RegisterScreen(),
+      ),
+
+      ///* Product Routes
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const ProductsScreen(),
+      ),
+    ],
+    redirect: (context, state) {
+      final isGoingTo = state.matchedLocation;
+      final authStatus = goRouterNotifier.authStatus;
+
+      if (isGoingTo == '/splash' && authStatus == AuthStatus.checking) {
+        return null;
+      } else if (authStatus == AuthStatus.notAuthenticated) {
+        if (isGoingTo == '/login' || isGoingTo == '/register') return null;
+
+        return '/login';
+      } else if (authStatus == AuthStatus.authenticated) {
+        if (isGoingTo == '/login' ||
+            isGoingTo == '/register' ||
+            isGoingTo == '/splash') {
+          return '/';
+        }
+      }
+
+      //*condiciones para proteción de rutas por perfiles
+      //if(user.isAdmin)
+
+      return null;
+    },
+  );
+});

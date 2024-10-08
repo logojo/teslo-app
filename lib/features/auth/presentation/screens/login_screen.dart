@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:teslo_app/features/auth/presentation/providers/auth_provider.dart';
+import 'package:teslo_app/features/auth/presentation/providers/login_form_provider.dart';
 import 'package:teslo_app/features/shared/shared.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -45,12 +48,27 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
-class _LoginForm extends StatelessWidget {
+class _LoginForm extends ConsumerWidget {
   const _LoginForm();
 
+//*Metodo que abre un snackbar para mostrar el error en pantalla
+  void showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final textStyles = Theme.of(context).textTheme;
+    final state = ref.watch(loginFormProvider);
+
+    //*Escuchando el provider para ver si cambiar la variable errorMessage
+    ref.listen(authProvider, (previous, next) {
+      if (next.errorMessage.isEmpty) return;
+
+      showSnackBar(context, next.errorMessage);
+    });
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -59,24 +77,32 @@ class _LoginForm extends StatelessWidget {
           const SizedBox(height: 50),
           Text('Login', style: textStyles.titleLarge),
           const SizedBox(height: 90),
-          const CustomTextFormField(
+          CustomTextFormField(
             label: 'Correo',
             keyboardType: TextInputType.emailAddress,
+            onChanged: ref.read(loginFormProvider.notifier).emailChange,
+            errorMessage: state.isFormPosted
+                ? state.email.errorMessage
+                : null, //* mostrando los errores solo si el formulario fue posteado
           ),
           const SizedBox(height: 30),
-          const CustomTextFormField(
+          CustomTextFormField(
             label: 'Contraseña',
             obscureText: true,
+            onChanged: ref.read(loginFormProvider.notifier).passwordChange,
+            errorMessage:
+                state.isFormPosted ? state.password.errorMessage : null,
           ),
           const SizedBox(height: 30),
           SizedBox(
               width: double.infinity,
               height: 60,
               child: CustomFilledButton(
-                text: 'Ingresar',
-                buttonColor: Colors.black,
-                onPressed: () {},
-              )),
+                  text: 'Ingresar',
+                  buttonColor: Colors.black,
+                  onPressed: state.isPosting
+                      ? null
+                      : ref.read(loginFormProvider.notifier).onSubmit)),
           const Spacer(flex: 2),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
