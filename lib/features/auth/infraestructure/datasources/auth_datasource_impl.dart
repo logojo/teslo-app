@@ -54,8 +54,31 @@ class AuthDatasourceImpl extends AuthDatasource {
   }
 
   @override
-  Future<User> register(String email, String password, String fullname) {
-    // TODO: implement register
-    throw UnimplementedError();
+  Future<User> register(String email, String password, String fullname) async {
+    try {
+      final res = await dio.post('/auth/register',
+          data: {'email': email, 'fullName': fullname, 'password': password});
+
+      final user = UserMapper.userJsonToEntity(res.data);
+
+      return user;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 400) {
+        //throw Wrongcredentials();
+        throw CustomError(e.response?.data['message'] ?? 'El correo ya existe');
+      }
+      if (e.response?.statusCode == 401) {
+        //throw Wrongcredentials();
+        throw CustomError(
+            e.response?.data['message'] ?? 'Credenciales no validas');
+      }
+      if (e.type == DioExceptionType.connectionTimeout) {
+        throw CustomError(
+            e.response?.data['message'] ?? 'Revise su conexion a internet');
+      }
+      throw Exception(e);
+    } catch (e) {
+      throw Exception(e);
+    }
   }
 }

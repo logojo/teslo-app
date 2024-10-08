@@ -38,13 +38,14 @@ final goRouterProvider = Provider((ref) {
     redirect: (context, state) {
       final isGoingTo = state.matchedLocation;
       final authStatus = goRouterNotifier.authStatus;
+      final acount = goRouterNotifier.acount;
 
       if (isGoingTo == '/splash' && authStatus == AuthStatus.checking) {
         return null;
       } else if (authStatus == AuthStatus.notAuthenticated) {
         if (isGoingTo == '/login' || isGoingTo == '/register') return null;
-
-        return '/login';
+        if (acount == Acount.exist) return '/login';
+        return '/register';
       } else if (authStatus == AuthStatus.authenticated) {
         if (isGoingTo == '/login' ||
             isGoingTo == '/register' ||

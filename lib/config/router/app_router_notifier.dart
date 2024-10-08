@@ -11,7 +11,9 @@ final goRouterNotifierProvider = Provider((ref) {
 //* ChangeNotifier no viene de riverpod viene con flutter y se puede utilizar para manejar estados
 class GoRouterNotifier extends ChangeNotifier {
   final AuthNotifier _authNotifier;
+
   AuthStatus _authStatus = AuthStatus.checking;
+  Acount _acount = Acount.nonExist;
 
   GoRouterNotifier(this._authNotifier) {
     //* esto me sirve para estar pendiente de los cambios que haga el _authNotifier
@@ -19,6 +21,7 @@ class GoRouterNotifier extends ChangeNotifier {
     //* aqui estoy utilizando la propiedad get
     _authNotifier.addListener((state) {
       authStatus = state.authStatus;
+      acount = state.acount;
     });
   }
 
@@ -29,6 +32,13 @@ class GoRouterNotifier extends ChangeNotifier {
     _authStatus = value;
 
     //*esto se utiliza para cambiar el estado del ChangeNotifier
+    notifyListeners();
+  }
+
+  Acount get acount => _acount;
+
+  set acount(Acount value) {
+    _acount = value;
     notifyListeners();
   }
 }

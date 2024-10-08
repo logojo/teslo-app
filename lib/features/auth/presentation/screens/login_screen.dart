@@ -61,6 +61,8 @@ class _LoginForm extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final textStyles = Theme.of(context).textTheme;
+
+    final username = ref.watch(authProvider).username;
     final state = ref.watch(loginFormProvider);
 
     //*Escuchando el provider para ver si cambiar la variable errorMessage
@@ -75,7 +77,7 @@ class _LoginForm extends ConsumerWidget {
       child: Column(
         children: [
           const SizedBox(height: 50),
-          Text('Login', style: textStyles.titleLarge),
+          Text('Hola $username!!', style: textStyles.titleMedium),
           const SizedBox(height: 90),
           CustomTextFormField(
             label: 'Correo',
