@@ -25,7 +25,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> login(String email, String password) async {
     try {
+      final username = await storageService.getValue<String>('usuario');
       final user = await authRepository.login(email, password);
+
+      if (username == null) {
+        await storageService.setKetValue('usuario', user.fullName);
+        await storageService.setKetValue('email', user.email);
+        await storageService.setKetValue('acount', Acount.exist.name);
+
+        state = state.copyWith(username: user.fullName);
+      }
+
       _setLoggedUser(user);
     } on CustomError catch (e) {
       //*error que viene del backend

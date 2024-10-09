@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:teslo_app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:teslo_app/features/auth/presentation/providers/login_form_provider.dart';
 import 'package:teslo_app/features/shared/shared.dart';
@@ -107,15 +106,15 @@ class _LoginForm extends ConsumerWidget {
                       ? null
                       : ref.read(loginFormProvider.notifier).onSubmit)),
           const Spacer(flex: 2),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text('¿No tienes cuenta?'),
-              TextButton(
-                  onPressed: () => context.push('/register'),
-                  child: const Text('Crea una aquí'))
-            ],
-          ),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.center,
+          //   children: [
+          //     const Text('¿No tienes cuenta?'),
+          //     TextButton(
+          //         onPressed: () => context.push('/register'),
+          //         child: const Text('Crea una aquí'))
+          //   ],
+          // ),
           const Spacer(flex: 1),
         ],
       ),
