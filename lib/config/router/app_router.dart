@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:teslo_app/features/auth/presentation/providers/auth_provider.dart';
+import 'package:teslo_app/features/products/presentation/screens/screens.dart';
 
 import 'app_router_notifier.dart';
 import 'package:teslo_app/features/auth/auth.dart';
-import 'package:teslo_app/features/products/presentation/screens/products_screen.dart';
 
 final goRouterProvider = Provider((ref) {
   final goRouterNotifier = ref.read(goRouterNotifierProvider);
@@ -33,6 +33,12 @@ final goRouterProvider = Provider((ref) {
       GoRoute(
         path: '/',
         builder: (context, state) => const ProductsScreen(),
+      ),
+
+      GoRoute(
+        path: '/product/:id',
+        builder: (context, state) =>
+            ProductScreen(productId: state.pathParameters['id'] ?? 'no-id'),
       ),
     ],
     redirect: (context, state) {
