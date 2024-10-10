@@ -15,9 +15,11 @@ class Price extends FormzInput<double, PriceError> {
     if (isValid || isPure) return null;
 
     if (displayError == PriceError.empty) return 'El campo es requerido';
-    if (displayError == PriceError.format) return 'No tiene formato numero';
     if (displayError == PriceError.negative) {
-      return 'No debe ser menor o igual a 0';
+      return 'Debe ser mayor o igual a 0';
+    }
+    if (displayError == PriceError.format) {
+      return 'No tiene formato numero valido';
     }
 
     return null;
@@ -29,9 +31,7 @@ class Price extends FormzInput<double, PriceError> {
     if (value.toString().isEmpty || value.toString().trim().isEmpty) {
       return PriceError.empty;
     }
-    final isInteger = int.tryParse(value.toString()) ?? -1;
 
-    if (isInteger == -1) return PriceError.format;
     if (value <= 0) return PriceError.negative;
 
     return null;
