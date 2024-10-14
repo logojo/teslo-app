@@ -38,7 +38,7 @@ class ProductFormNotifier extends StateNotifier<ProductFormState> {
   Future<bool> onSubmit() async {
     _touchedEverything();
 
-    if (state.isValid) return false;
+    if (!state.isValid) return false;
 
     if (onSubmitCallback == null) return false;
 
@@ -54,7 +54,7 @@ class ProductFormNotifier extends StateNotifier<ProductFormState> {
       'tags': state.tags.split(','),
       'images': state.images
           .map((image) =>
-              image.replaceAll('${Environment.apiUrl}/files/product', ''))
+              image.replaceAll('${Environment.apiUrl}/files/product/', ''))
           .toList()
     };
 
