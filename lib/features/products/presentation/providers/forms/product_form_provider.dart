@@ -3,21 +3,21 @@ import 'package:formz/formz.dart';
 
 import 'package:teslo_app/config/config.dart';
 import 'package:teslo_app/features/products/domain/domain.dart';
-import 'package:teslo_app/features/products/presentation/providers/products_respository_providers.dart';
+import 'package:teslo_app/features/products/presentation/providers/providers.dart';
 import 'package:teslo_app/features/shared/infraestructure/inputs/inpust.dart';
 
 final productFormProvider = StateNotifierProvider.autoDispose
     .family<ProductFormNotifier, ProductFormState, Product>((ref, product) {
   //* variable que recibe de otro provider la funcion del repositorio que a su vez llama la fnc del datasource
   final createUpdateCallback =
-      ref.watch(productsRepositoryProvider).createUpdateProduct;
+      ref.watch(productsProvider.notifier).createOrUpdateProduct;
 
   return ProductFormNotifier(
       product: product, onSubmitCallback: createUpdateCallback);
 });
 
 class ProductFormNotifier extends StateNotifier<ProductFormState> {
-  final Future<Product> Function(Map<String, dynamic> productLike)?
+  final Future<bool> Function(Map<String, dynamic> productLike)?
       onSubmitCallback;
 
   //* creado contructor con valores inicializados
@@ -43,7 +43,7 @@ class ProductFormNotifier extends StateNotifier<ProductFormState> {
     if (onSubmitCallback == null) return false;
 
     final productLike = {
-      'id': state.id,
+      'id': (state.id == 'new') ? null : state.id,
       'title': state.title.value,
       'price': state.price.value,
       'description': state.description,
@@ -59,8 +59,7 @@ class ProductFormNotifier extends StateNotifier<ProductFormState> {
     };
 
     try {
-      await onSubmitCallback!(productLike);
-      return true;
+      return await onSubmitCallback!(productLike);
     } catch (e) {
       return false;
     }
